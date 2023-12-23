@@ -7,6 +7,7 @@ import dalleRoutes from './routes/dalleRoutes.js';
 
 
 dotenv.config();
+const port = 3000;
 
 const app = express();
 app.use(cors());
@@ -21,7 +22,7 @@ app.get('/', async (req,res) => {
 const startServer = async () => {
 try {
     connectDB(process.env.MONGODB_URL);
-    app.listen(8080, () => console.log('serber has started on port https://localhost:8080'))
+    app.listen(port, () => console.log(`server has started on port ${port}`))
 } catch (error) {
     console.log(error);
 }
