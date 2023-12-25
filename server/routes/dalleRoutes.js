@@ -1,10 +1,13 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
+import PostSchema from '../mongodb/models/post.js';
 
 dotenv.config();
 
 const router = express.Router();
+router.use(express.json())
+
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,6 +17,33 @@ const openai = new OpenAIApi(configuration);
 
 router.route('/').get((req, res) => {
   res.status(200).json({ message: 'Hello from DALL-E!' });
+});
+
+router.post('/', async (request, response) => {
+  try {
+      if (
+          !request.body.prompt ||
+          !request.body.name 
+          // !request.body.photo
+      ) {
+          return response.status(400).send({
+              message: 'Send all required fields: name,photo,prompt',
+          });
+      }
+      const newPostSchema = {
+          prompt: request.body.prompt,
+          name: request.body.name
+          // photo: request.body.photo,
+      };
+
+      const post = await PostSchema.create(newPostSchema);
+
+      return response.status(201).send(PostSchema[0]);
+      
+  } catch (error) {
+      console.log(error.message);
+      response.status(500).send({ message: error.message });
+  }
 });
 
 router.route('/').post(async (req, res) => {
